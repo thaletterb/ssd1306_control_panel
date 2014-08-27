@@ -105,7 +105,7 @@ int main(void)
     setup_i2c();
     //drawBuffer(0,0,buffer);
     //_delay_ms(1000);
-    clearBuffer(buffer);
+    //clearBuffer(buffer);
     ////lcd_draw_char(10, 2, 'B', buffer);
     //lcd_draw_string(10, 0, "Hello World!", buffer);
     //lcd_draw_string(10, 7, "2014 Elegant Circuits", buffer);
@@ -121,7 +121,6 @@ int main(void)
     //PORTB=0xFF;
     }
     for(;;){
-        //PORTB=0xFF;
         clearBuffer(buffer);
         uint8_t adcVal;
         char valueIn[4];
@@ -129,7 +128,9 @@ int main(void)
         adcVal = ADCH;
         itoa(adcVal, valueIn, 10);
         lcd_draw_string(0,0,valueIn , buffer);
+        PORTB=0x00;
         drawBuffer(0, 0, buffer);
+        PORTB=0xFF;
         //if(ADCH < 128){
         //    PORTB=0x00;
         //}
@@ -212,6 +213,7 @@ void clearBuffer(uint8_t *buff){
 }
 
 void drawBuffer(uint8_t column_address, uint8_t page_address, uint8_t *buff){
+    i2c_start(DevSSD1306+I2C_WRITE); 
     i2c_write(0x21);        // column address
     i2c_write(0);           // column start address (0 = reset)
     i2c_write(127);         // column end addres (127 = reset)
@@ -227,7 +229,7 @@ void drawBuffer(uint8_t column_address, uint8_t page_address, uint8_t *buff){
         unsigned char ret = i2c_start(DevSSD1306+I2C_WRITE);   // set device address and write mode
         if ( ret ) {
             /* failed to issue start condition, possibly no device found */
-            //i2c_stop();
+            i2c_stop();
             PORTB=0xff;                            // activate all 8 LED to show error */
         }
         else {
@@ -237,7 +239,7 @@ void drawBuffer(uint8_t column_address, uint8_t page_address, uint8_t *buff){
                 i++;
             }
             i--;
-            //i2c_stop();
+            i2c_stop();
             TWBR = twbrbackup;
         }
     }
