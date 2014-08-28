@@ -129,7 +129,8 @@ int main(void)
         itoa(adcVal, valueIn, 10);
         lcd_draw_string(0,0,valueIn , buffer);
         PORTB=0x00;
-        drawBuffer(0, 0, buffer);
+        //drawBuffer(0, 0, buffer);
+        drawBuffer(64, 3, buffer);
         PORTB=0xFF;
         //if(ADCH < 128){
         //    PORTB=0x00;
