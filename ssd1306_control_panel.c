@@ -93,7 +93,6 @@ int main(void)
 
     i2c_init();                                // init I2C interface
 
-    /* write 0x75 to eeprom address 0x05 (Byte Write) */
     ret = i2c_start(DevSSD1306+I2C_WRITE);       // set device address and write mode
     if ( ret ) {
         /* failed to issue start condition, possibly no device found */
