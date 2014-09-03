@@ -121,10 +121,12 @@ int main(void)
     }
     for(;;){
         clearBuffer(buffer);
-        uint8_t adcVal;
+        //uint8_t adcVal;
+        uint16_t adcVal;
         char valueIn[4];
         ADCSRA |= (1 << ADSC); // Start a new conversion, 
-        adcVal = ADCH;
+        //adcVal = ADCH;       // 8 bit reading
+        adcVal = ADC;       // 10 bit reading
         itoa(adcVal, valueIn, 10);
         lcd_draw_string(0,0,valueIn , buffer);
         PORTB=0x00;
@@ -145,7 +147,7 @@ void setup_adc(){
     //ADCSRA |= (1<<ADPS2);   // setups up ADC clock prescalar to 16
     ADMUX |= (1<<REFS0);                            // set ref voltage to AVCC
     ADMUX |= (1<<MUX1);                             // setup ADC Channel 2
-    ADMUX |= (1<<ADLAR);                            // left align results in ADC registers (10 bits across 2 regs)
+    //ADMUX |= (1<<ADLAR);                            // left align results in ADC registers (10 bits across 2 regs)
 
     ADCSRB &= ~(1<<ADTS2);  // These three cleared should enable free-running mode
     ADCSRB &= ~(1<<ADTS1);
