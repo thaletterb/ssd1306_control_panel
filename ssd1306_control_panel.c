@@ -106,41 +106,20 @@ int main(void)
     }
     for(;;){
         clearBuffer(buffer);
-        //sample_adc_ch2();
-        sample_adc_ch2();
-        sample_adc_ch3();
 
-        //PORTB=0x00;
-        //drawBuffer(0, 0, buffer);
-        //PORTB=0xFF;
+        sample_adc_channel(2);
+        sample_adc_channel(3);
 
-        //clearBuffer(buffer);
-        //uint16_t adcVal;
-        //char valueIn[4];
-        //ADCSRA |= (1 << ADSC); // Start a new conversion, 
-        ////adcVal = ADCH;       // 8 bit reading
-        //adcVal = ADC;       // 10 bit reading
-        //itoa(adcVal, valueIn, 10);
-        //lcd_draw_string(0,0,valueIn , buffer);
+        PORTB=0x00;
+        drawBuffer(0, 0, buffer);
+        PORTB=0xFF;
 
-        //PORTB=0x00;
-        //drawBuffer(64, 3, buffer);
-        //PORTB=0xFF;
-
-        //if(ADCH < 128){
-        //    PORTB=0x00;
-        //}
-        //else{
-        //    PORTB=0xFF;
-        //}
     }
 }
 
 void setup_adc(){
     ADCSRA |= ((1<<ADPS1)|(1<<ADPS0));   // setups up ADC clock prescalar to 16
-    //ADCSRA |= (1<<ADPS2);   // setups up ADC clock prescalar to 16
-    //ADMUX |= (1<<REFS0);                            // set ref voltage to AVCC
-    //ADMUX |= (1<<MUX1);                             // setup ADC Channel 2
+    ADMUX |= (1<<REFS0);                            // set ref voltage to AVCC
     //ADMUX |= (1<<ADLAR);                            // left align results in ADC registers (10 bits across 2 regs)
 
     ADCSRB &= ~(1<<ADTS2);  // These three cleared should enable free-running mode
@@ -153,40 +132,29 @@ void setup_adc(){
     ADCSRA |= (1<<ADSC);                            // start sampling
 
 }
-void sample_adc_ch2(){
-    ADMUX |= (1<<REFS0);                            // set ref voltage to AVCC
+void sample_adc_channel(uint8_t channel){
     ADMUX &= ~((1<<MUX3)|(1<<MUX2)|(1<<MUX1)|(1<<MUX0));    // Clear ADC Mux Bits
-    ADMUX |= (1<<MUX1);                             // setup ADC Channel 2
+    if(channel == 2){
+        ADMUX |= (1<<MUX1);                             // setup ADC Channel 2
+        uint16_t adcVal;
+        char valueIn[4];
 
-    uint16_t adcVal;
-    char valueIn[4];
+        ADCSRA |= (1 << ADSC); // Start a new conversion, 
+        adcVal = ADC;       // 10 bit reading
+        itoa(adcVal, valueIn, 10);
+        lcd_draw_string(0,0,valueIn , buffer);
+    }
+    else if(channel == 3){
+        ADMUX |= ((1<<MUX1)|(1<<MUX0));                 // setup ADC Channel 3
+        uint16_t adcVal;
+        char valueIn[4];
 
-    ADCSRA |= (1 << ADSC); // Start a new conversion, 
-    adcVal = ADC;       // 10 bit reading
-    itoa(adcVal, valueIn, 10);
-    lcd_draw_string(0,0,valueIn , buffer);
-    PORTB=0x00;
-    drawBuffer(0, 0, buffer);
-    PORTB=0xFF;
+        ADCSRA |= (1 << ADSC); // Start a new conversion, 
+        adcVal = ADC;       // 10 bit reading
+        itoa(adcVal, valueIn, 10);
+        lcd_draw_string(0,3,valueIn , buffer);
+    }
 
-}
-
-void sample_adc_ch3(){
-    ADMUX |= (1<<REFS0);                            // set ref voltage to AVCC
-    ADMUX &= ~((1<<MUX3)|(1<<MUX2)|(1<<MUX1)|(1<<MUX0));    // Clear ADC Mux Bits
-    ADMUX |= ((1<<MUX1)|(1<<MUX0));                 // setup ADC Channel 3
-
-    uint16_t adcVal;
-    char valueIn[4];
-
-    ADCSRA |= (1 << ADSC); // Start a new conversion, 
-    adcVal = ADC;       // 10 bit reading
-    adcVal = ADC;       // 10 bit reading
-    itoa(adcVal, valueIn, 10);
-    lcd_draw_string(3,3,valueIn , buffer);
-    PORTB=0x00;
-    drawBuffer(0, 0, buffer);
-    PORTB=0xFF;
 
 }
 
