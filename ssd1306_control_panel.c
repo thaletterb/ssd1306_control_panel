@@ -8,6 +8,9 @@ Hardware: Atmega328P AVR
 Description:
     This example shows how to create an OLED based control panel based on user input
 
+HW Description:
+
+
 *****************************************************************************/
 #include <avr/io.h>
 #include <avr/delay.h>
@@ -107,12 +110,15 @@ int main(void)
     for(;;){
         clearBuffer(buffer);
 
+        // get accelerometer values
+        sample_adc_channel(1);
         sample_adc_channel(2);
         sample_adc_channel(3);
 
         PORTB=0x00;
         drawBuffer(0, 0, buffer);
         PORTB=0xFF;
+        _delay_ms(500);
 
     }
 }
@@ -134,7 +140,20 @@ void setup_adc(){
 }
 void sample_adc_channel(uint8_t channel){
     ADMUX &= ~((1<<MUX3)|(1<<MUX2)|(1<<MUX1)|(1<<MUX0));    // Clear ADC Mux Bits
-    if(channel == 2){
+    if(channel == 1){
+        ADMUX |= (1<<MUX0);                             // setup ADC Channel 1
+        uint16_t adcVal;
+        char valueIn[4];
+
+        lcd_draw_string(0, 0, "ADXL335 Readings: " , buffer);
+
+        ADCSRA |= (1 << ADSC); // Start a new conversion, 
+        adcVal = ADC;       // 10 bit reading
+        itoa(adcVal, valueIn, 10);
+        lcd_draw_string(0,2, "X: " , buffer);
+        lcd_draw_string(13, 2, valueIn, buffer);
+    }
+    else if(channel == 2){
         ADMUX |= (1<<MUX1);                             // setup ADC Channel 2
         uint16_t adcVal;
         char valueIn[4];
@@ -142,7 +161,8 @@ void sample_adc_channel(uint8_t channel){
         ADCSRA |= (1 << ADSC); // Start a new conversion, 
         adcVal = ADC;       // 10 bit reading
         itoa(adcVal, valueIn, 10);
-        lcd_draw_string(0,0,valueIn , buffer);
+        lcd_draw_string(0, 3, "Y: ", buffer);
+        lcd_draw_string(13, 3, valueIn, buffer);
     }
     else if(channel == 3){
         ADMUX |= ((1<<MUX1)|(1<<MUX0));                 // setup ADC Channel 3
@@ -152,7 +172,8 @@ void sample_adc_channel(uint8_t channel){
         ADCSRA |= (1 << ADSC); // Start a new conversion, 
         adcVal = ADC;       // 10 bit reading
         itoa(adcVal, valueIn, 10);
-        lcd_draw_string(0,3,valueIn , buffer);
+        lcd_draw_string(0, 4, "Z: ", buffer);
+        lcd_draw_string(13, 4, valueIn, buffer);
     }
 
 
